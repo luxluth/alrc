@@ -11,6 +11,15 @@ Those new additions don’t by any mean break previous specification of the
 format. The compatibility with `A2 extension` is preserved and is even
 supported in the vocals. Chained timestamps are also supported.
 
+## Installation
+
+```bash
+cargo add alrc
+```
+
+> Use the `serde` feature to add support for serde serialization and deserialization
+
+
 ## Named Markers
 
 Those aim to provide a context for the lyric line.
