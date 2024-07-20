@@ -2,6 +2,14 @@
 name = "alrc"
 version = "0.1.0"
 edition = "2021"
+authors = ["luxluth"]
+description = "Advanced Lyrics File Format"
+categories = ["parser-implementations"]
+repository = "https://github.com/luxluth/alrc/"
+rust-version = "1.60"
+license = "MIT"
+readme = "README.md"
+keywords = ["lrc", "lyrics", "parser"]
 
 [dependencies]
 lazy_static = "1.5.0"

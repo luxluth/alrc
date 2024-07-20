@@ -1,36 +1,36 @@
-= Advanced Lyrics File
+# Advanced Lyrics File
 
 What does this add to the `lrc` base format ?
 
-* Named Markers
-* Vocals
-* Instrumental Line Check
-* Custom Tags
+- Named Markers
+- Vocals
+- Instrumental Line Check
+- Custom Tags
 
-Those new additions don't by any mean break previous specification of the 
-format. The compatibility with `A2 extension` is preserved and is even 
+Those new additions don’t by any mean break previous specification of the
+format. The compatibility with `A2 extension` is preserved and is even
 supported in the vocals. Chained timestamps are also supported.
 
-== Named Markers
+## Named Markers
 
 Those aim to provide a context for the lyric line.
 An use case can be for the singer that sing the line
 
-.Named Marker Example
-[source,lrc]
-----
+**Named Marker Example**
+
+```lrc
 {@singer:The Name Of The Singer}
-----
+```
 
-The marker will be represented with the key `singer` and 
-value `The Name Of The Singer` 
+The marker will be represented with the key `singer` and
+value `The Name Of The Singer`
 
-Each time the a new Markers is encounter by the parser the current marker 
+Each time a new Markers is encounter by the parser the current marker
 value is changed.
 
-.Named Marker Change Example
-[source,lrc]
-----
+**Named Marker Change Example**
+
+```lrc
 {@singer:Childish Gambino}
 
 [00:15.84] Cody LaRae
@@ -47,37 +47,35 @@ value is changed.
 [00:45.54] (No one, no one)
 
 ...
-----
+```
 
-== Vocals
+## Vocals
 
 Vocals are background voices other than the main artist voice.
-Most of the times, they are represented between parenthesis to signify 
-that they are not importants.
+Most of the times, they are represented between parenthesis to signify
+that they are not important.
 
-.Example of vocals
-[source,lrc]
-----
+**Example of vocals**
+
+```lrc
 ...
 
 [00:52.71] {#vocal:No one} nobody gives a fuck
 ...
-----
+```
 
 A single single line can have multiples vocals
 
-== Instrumental Line Check
+## Instrumental Line Check
 
 Any line that contains only `#INSTRUMENTAL` is consider as a line where
 there is a long instrumental pause.
 
-[source,lrc]
-----
+```lrc
 [00:50.07] #INSTRUMENTAL
-----
+```
 
-== Custom Tags
+## Custom Tags
 
-Now with this parser, tags doesn't matter to it. Therfore, you can create any
+Now with this parser, tags does not matter to it. Therefore, you can create any
 tag that suite your needs.
-
