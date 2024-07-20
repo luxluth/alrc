@@ -5,11 +5,7 @@ use nom::{
     IResult,
 };
 
-use std::{
-    collections::HashMap,
-    time::{Duration, SystemTime},
-    usize,
-};
+use std::{collections::HashMap, time::Duration, usize};
 
 use lazy_static::lazy_static;
 
@@ -142,7 +138,6 @@ pub struct AdvancedLrc {
 
 impl AdvancedLrc {
     pub fn parse(input: &str) -> Result<Self, String> {
-        let start = SystemTime::now();
         let lines: Vec<&str> = input.lines().collect();
         let mut meta = Metadata::new();
         let mut parsed_lines: Vec<Line> = vec![];
@@ -176,14 +171,15 @@ impl AdvancedLrc {
                     current_marker =
                         Marker::Named(marker.replace('@', "").to_string(), value.to_string());
                 }
+            } else if line.starts_with('#') {
+                ln += 1;
+                continue;
             } else {
                 parsed_lines.extend(AdvancedLrc::parse_line(line, current_marker.clone(), ln)?);
             }
 
             ln += 1;
         }
-
-        eprintln!("takes: {}µs", start.elapsed().unwrap().as_micros());
 
         Ok(Self {
             metadata: meta,
