@@ -3,10 +3,10 @@
 //!
 //! What does this add to the `lrc` base format ?
 //!
-//! * Named Markers
-//! * Vocals
-//! * Instrumental Line Check
-//! * Custom Tags
+//! - Named Markers
+//! - Vocals
+//! - Instrumental Line Check
+//! - Custom Tags
 //!
 //! Those new additions don’t by any mean break previous specification of the
 //! format. The compatibility with `A2 extension` is preserved and is even
@@ -26,7 +26,7 @@
 //! The marker will be represented with the key `singer` and
 //! value `The Name Of The Singer`
 //!
-//! Each time the a new Markers is encounter by the parser the current marker
+//! Each time a new Markers is encounter by the parser the current marker
 //! value is changed.
 //!
 //! **Named Marker Change Example**
@@ -54,7 +54,7 @@
 //!
 //! Vocals are background voices other than the main artist voice.
 //! Most of the times, they are represented between parenthesis to signify
-//! that they are not importants.
+//! that they are not important.
 //!
 //! **Example of vocals**
 //!
@@ -78,7 +78,7 @@
 //!
 //! ## Custom Tags
 //!
-//! Now with this parser, tags doesn’t matter to it. Therfore, you can create any
+//! Now with this parser, tags does not matter to it. Therefore, you can create any
 //! tag that suite your needs.
 
 #![doc(issue_tracker_base_url = "https://github.com/luxluth/alrc/issues/")]
