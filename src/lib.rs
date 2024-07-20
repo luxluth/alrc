@@ -1,3 +1,88 @@
+#![warn(missing_docs)]
+//! # Advanced Lyrics File
+//!
+//! What does this add to the `lrc` base format ?
+//!
+//! * Named Markers
+//! * Vocals
+//! * Instrumental Line Check
+//! * Custom Tags
+//!
+//! Those new additions don’t by any mean break previous specification of the
+//! format. The compatibility with `A2 extension` is preserved and is even
+//! supported in the vocals. Chained timestamps are also supported.
+//!
+//! ## Named Markers
+//!
+//! Those aim to provide a context for the lyric line.
+//! An use case can be for the singer that sing the line
+//!
+//! **Named Marker Example**
+//!
+//! ```lrc
+//! {@singer:The Name Of The Singer}
+//! ```
+//!
+//! The marker will be represented with the key `singer` and
+//! value `The Name Of The Singer`
+//!
+//! Each time the a new Markers is encounter by the parser the current marker
+//! value is changed.
+//!
+//! **Named Marker Change Example**
+//!
+//! ```lrc
+//! {@singer:Childish Gambino}
+//!
+//! [00:15.84] Cody LaRae
+//! [00:19.30] He had a break
+//! [00:22.75] He's findin' out
+//! [00:25.92] That nobody gives a fuck
+//! [00:29.68] I did my job
+//! [00:32.91] I paid my dues
+//! [00:36.13] Love is for fools
+//! [00:39.33] 'Cause nobody gives a fuck
+//!
+//! {@singer:VOCALS}
+//!
+//! [00:45.54] (No one, no one)
+//!
+//! ...
+//! ```
+//!
+//! ## Vocals
+//!
+//! Vocals are background voices other than the main artist voice.
+//! Most of the times, they are represented between parenthesis to signify
+//! that they are not importants.
+//!
+//! **Example of vocals**
+//!
+//! ```lrc
+//! ...
+//!
+//! [00:52.71] {#vocal:No one} nobody gives a fuck
+//! ...
+//! ```
+//!
+//! A single single line can have multiples vocals
+//!
+//! ## Instrumental Line Check
+//!
+//! Any line that contains only `#INSTRUMENTAL` is consider as a line where
+//! there is a long instrumental pause.
+//!
+//! ```lrc
+//! [00:50.07] #INSTRUMENTAL
+//! ```
+//!
+//! ## Custom Tags
+//!
+//! Now with this parser, tags doesn’t matter to it. Therfore, you can create any
+//! tag that suite your needs.
+
+#![doc(issue_tracker_base_url = "https://github.com/luxluth/alrc/issues/")]
+
 use lazy_static::lazy_static;
 use nom::{
     character::complete::{char, digit1},
@@ -13,12 +98,16 @@ lazy_static! {
     static ref VOCAL_RE: regex::Regex = regex::Regex::new(r"\{#vocal:(.*?)\}").unwrap();
 }
 
+/// HashMap that store key value of and attribute
 pub type Metadata = HashMap<String, String>;
 
+/// Marker are used to denote a line
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
 pub enum Marker {
+    /// Named marker
     Named(String, String),
+    /// Empty marker
     Empty,
 }
 
@@ -35,10 +124,13 @@ impl std::fmt::Display for Marker {
     }
 }
 
+/// A chunk of the base text that is timed
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug)]
 pub struct Syllable {
+    /// Syllable text
     pub text: String,
+    /// The time at the syllable is pronouunced
     pub start: RawTimestamp,
 }
 
@@ -57,7 +149,7 @@ fn make_time(arr: &mut impl Iterator<Item = char>) -> RawTimestamp {
 }
 
 impl Syllable {
-    pub fn parse_many(input: &str, start_time: RawTimestamp) -> Vec<Self> {
+    fn parse_many(input: &str, start_time: RawTimestamp) -> Vec<Self> {
         let mut text_iter = input.chars().peekable();
         let mut current_text = String::new();
         let mut syllables: Vec<Syllable> = vec![];
@@ -104,7 +196,7 @@ impl ToString for Vec<Syllable> {
 }
 
 impl Vocal {
-    pub fn parse(input: &str, start_time: RawTimestamp) -> Self {
+    fn parse(input: &str, start_time: RawTimestamp) -> Self {
         let syllables = Syllable::parse_many(input, start_time);
         Self {
             text: syllables.to_string(),
@@ -114,34 +206,50 @@ impl Vocal {
     }
 }
 
+/// Vocal Container
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug)]
 pub struct Vocal {
+    /// Global vocal text
     pub text: String,
+    /// Time at which start the vocals
     pub time: RawTimestamp,
+    /// syllables from text
     pub syllables: Vec<Syllable>,
 }
 
+/// Vocal Container
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug)]
 pub struct Line {
+    /// [Marker]
     pub marker: Marker,
+    /// The [Syllable] array
     pub syllables: Vec<Syllable>,
+    /// The text representing the line
     pub text: String,
+    /// Lyric line time start
     pub time: RawTimestamp,
+    /// The [Vocal] array
     pub vocals: Vec<Vocal>,
+    /// Line location
     pub ln: usize,
+    /// Determine if a line is instrumental
     pub is_instrumental: bool,
 }
 
+/// Parsed lyrics conatiner
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug)]
 pub struct AdvancedLrc {
+    /// Lyrics [Metadata]
     pub metadata: Metadata,
+    /// Parsed [Line] array
     pub lines: Vec<Line>,
 }
 
 impl AdvancedLrc {
+    /// Parse lrc text
     pub fn parse(input: &str) -> Result<Self, String> {
         let lines: Vec<&str> = input.lines().collect();
         let mut meta = Metadata::new();
@@ -231,16 +339,20 @@ impl AdvancedLrc {
     }
 }
 
+/// Simple Timestamp
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct RawTimestamp {
+    /// Timestamp minutes
     pub minutes: u8,
+    /// Timestamp seconds
     pub seconds: u8,
+    /// Timestamp millis
     pub millis: Option<u8>,
 }
 
 impl RawTimestamp {
-    pub fn parse(input: &str, start: char, end: char) -> IResult<&str, RawTimestamp> {
+    fn parse(input: &str, start: char, end: char) -> IResult<&str, RawTimestamp> {
         let (input, (_, minutes, _, seconds, millis, _)) = tuple((
             char(start),
             parse_minutes,
@@ -260,6 +372,7 @@ impl RawTimestamp {
         ))
     }
 
+    /// Convert timestamp to standard duration
     pub fn to_duration(&self) -> Duration {
         Duration::from_millis(
             (((self.minutes as u64) * 60 + self.seconds as u64) * 1000)
@@ -267,7 +380,7 @@ impl RawTimestamp {
         )
     }
 
-    pub fn parse_many(input: &str, start: char, end: char) -> (Vec<RawTimestamp>, &str) {
+    fn parse_many(input: &str, start: char, end: char) -> (Vec<RawTimestamp>, &str) {
         let mut remaining = input;
         let mut timestamps = Vec::new();
 
