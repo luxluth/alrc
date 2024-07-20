@@ -1,13 +1,13 @@
+use lazy_static::lazy_static;
 use nom::{
     character::complete::{char, digit1},
     combinator::{map_res, opt},
     sequence::{preceded, tuple},
     IResult,
 };
-
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, time::Duration, usize};
-
-use lazy_static::lazy_static;
 
 lazy_static! {
     static ref VOCAL_RE: regex::Regex = regex::Regex::new(r"\{#vocal:(.*?)\}").unwrap();
@@ -15,6 +15,7 @@ lazy_static! {
 
 pub type Metadata = HashMap<String, String>;
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
 pub enum Marker {
     Named(String, String),
@@ -34,6 +35,7 @@ impl std::fmt::Display for Marker {
     }
 }
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug)]
 pub struct Syllable {
     pub text: String,
@@ -112,6 +114,7 @@ impl Vocal {
     }
 }
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug)]
 pub struct Vocal {
     pub text: String,
@@ -119,6 +122,7 @@ pub struct Vocal {
     pub syllables: Vec<Syllable>,
 }
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug)]
 pub struct Line {
     pub marker: Marker,
@@ -130,6 +134,7 @@ pub struct Line {
     pub is_instrumental: bool,
 }
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug)]
 pub struct AdvancedLrc {
     pub metadata: Metadata,
@@ -226,6 +231,7 @@ impl AdvancedLrc {
     }
 }
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct RawTimestamp {
     pub minutes: u8,
